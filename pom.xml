@@ -11,6 +11,7 @@
 	<description>Spring Boot Build</description>
 	<properties>
 		<revision>2.2.13.RELEASE</revision>
+		<disable.checks>true</disable.checks>
 		<main.basedir>${basedir}</main.basedir>
 	</properties>
 	<!-- Most elements are in profiles so they are stripped out during maven-flatten -->

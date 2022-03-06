@@ -240,11 +240,10 @@ public class SpringApplication {
 	private boolean lazyInitialization = false;
 
 	/**
-	 * Create a new {@link SpringApplication} instance. The application context will load
-	 * beans from the specified primary sources (see {@link SpringApplication class-level}
-	 * documentation for details. The instance can be customized before calling
+	 * 创建一个{@link SpringApplication}实例. 应用程序上下文会从指定的主类（primarySources）开始加载需要管理的Beans (see {@link SpringApplication class-level}
+	 * documentation for details. 这个实例可以在调用之前做很多自定义的操作
 	 * {@link #run(String...)}.
-	 * @param primarySources the primary bean sources
+	 * @param primarySources	主类
 	 * @see #run(Class, String[])
 	 * @see #SpringApplication(ResourceLoader, Class...)
 	 * @see #setSources(Set)
@@ -254,12 +253,11 @@ public class SpringApplication {
 	}
 
 	/**
-	 * Create a new {@link SpringApplication} instance. The application context will load
-	 * beans from the specified primary sources (see {@link SpringApplication class-level}
-	 * documentation for details. The instance can be customized before calling
+	 * 创建一个{@link SpringApplication}实例. 应用程序上下文会从指定的主类（primarySources）开始加载需要管理的Beans (see {@link SpringApplication class-level}
+	 * documentation for details. 这个实例可以在调用之前做很多自定义的操作
 	 * {@link #run(String...)}.
-	 * @param resourceLoader the resource loader to use
-	 * @param primarySources the primary bean sources
+	 * @param resourceLoader	资源加载器
+	 * @param primarySources	主类
 	 * @see #run(Class, String[])
 	 * @see #setSources(Set)
 	 */
@@ -267,16 +265,32 @@ public class SpringApplication {
 	public SpringApplication(ResourceLoader resourceLoader, Class<?>... primarySources) {
 		this.resourceLoader = resourceLoader;
 		Assert.notNull(primarySources, "PrimarySources must not be null");
+		
+		// 1.主类转换成有序的Set集合
 		this.primarySources = new LinkedHashSet<>(Arrays.asList(primarySources));
+		
+		// 2.判断当前SpringApplication是哪种格式
 		this.webApplicationType = WebApplicationType.deduceFromClasspath();
+		
+		// 3.获取所有的上下文初始化器
 		setInitializers((Collection) getSpringFactoriesInstances(ApplicationContextInitializer.class));
+		
+		// 4.获取所有的监听器
 		setListeners((Collection) getSpringFactoriesInstances(ApplicationListener.class));
+		
+		// 5.设置主类的类型
 		this.mainApplicationClass = deduceMainApplicationClass();
 	}
 
+	/**
+	 * 判断一下主类的Class类型
+	 * @return
+	 */
 	private Class<?> deduceMainApplicationClass() {
 		try {
 			StackTraceElement[] stackTrace = new RuntimeException().getStackTrace();
+
+			// 这里是从当前方法堆栈中一级一级往下找，一直找到跑main方法的那个类
 			for (StackTraceElement stackTraceElement : stackTrace) {
 				if ("main".equals(stackTraceElement.getMethodName())) {
 					return Class.forName(stackTraceElement.getClassName());
@@ -290,14 +304,16 @@ public class SpringApplication {
 	}
 
 	/**
-	 * Run the Spring application, creating and refreshing a new
-	 * {@link ApplicationContext}.
-	 * @param args the application arguments (usually passed from a Java main method)
-	 * @return a running {@link ApplicationContext}
+	 * ★★★★ 启动一个Spring应用的核心主干方法【重要】 ★★★★
+	 * 这里会启动一个ConfigurableApplicationContext，它是{@link ApplicationContext}的子类
+	 * @param args	应用程序启动参数（通常是main方法参数带过来的）
+	 * @return		a running {@link ApplicationContext}
 	 */
 	public ConfigurableApplicationContext run(String... args) {
+		// 1. 这里启动一个计时器
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();
+		
 		ConfigurableApplicationContext context = null;
 		Collection<SpringBootExceptionReporter> exceptionReporters = new ArrayList<>();
 		configureHeadlessProperty();
@@ -314,11 +330,18 @@ public class SpringApplication {
 			prepareContext(context, environment, listeners, applicationArguments, printedBanner);
 			refreshContext(context);
 			afterRefresh(context, applicationArguments);
+			
+			// 这里计时器停止，打印一下启动时间和一些应用信息
 			stopWatch.stop();
+
 			if (this.logStartupInfo) {
 				new StartupInfoLogger(this.mainApplicationClass).logStarted(getApplicationLog(), stopWatch);
 			}
+			
+			// SpringApplicationRunListener类型的监听器是在这里启动的
 			listeners.started(context);
+			
+			// ApplicationRunner和CommandLineRunner类型的运行器是在这里调用的
 			callRunners(context, applicationArguments);
 		}
 		catch (Throwable ex) {
@@ -755,11 +778,19 @@ public class SpringApplication {
 	protected void afterRefresh(ConfigurableApplicationContext context, ApplicationArguments args) {
 	}
 
+	/**
+	 * {@link ApplicationRunner}和{@link CommandLineRunner}在这里被上下文使用
+	 * @param context
+	 * @param args
+	 */
 	private void callRunners(ApplicationContext context, ApplicationArguments args) {
 		List<Object> runners = new ArrayList<>();
 		runners.addAll(context.getBeansOfType(ApplicationRunner.class).values());
 		runners.addAll(context.getBeansOfType(CommandLineRunner.class).values());
+		
+		// 这里排序，说明这俩类对象跑起来还有先后顺序
 		AnnotationAwareOrderComparator.sort(runners);
+		
 		for (Object runner : new LinkedHashSet<>(runners)) {
 			if (runner instanceof ApplicationRunner) {
 				callRunner((ApplicationRunner) runner, args);
@@ -770,6 +801,11 @@ public class SpringApplication {
 		}
 	}
 
+	/**
+	 * 跑{@link ApplicationRunner}
+	 * @param runner
+	 * @param args
+	 */
 	private void callRunner(ApplicationRunner runner, ApplicationArguments args) {
 		try {
 			(runner).run(args);
@@ -779,6 +815,11 @@ public class SpringApplication {
 		}
 	}
 
+	/**
+	 * 跑{@link CommandLineRunner}
+	 * @param runner
+	 * @param args
+	 */
 	private void callRunner(CommandLineRunner runner, ApplicationArguments args) {
 		try {
 			(runner).run(args.getSourceArgs());
@@ -1205,24 +1246,24 @@ public class SpringApplication {
 	}
 
 	/**
-	 * Static helper that can be used to run a {@link SpringApplication} from the
-	 * specified source using default settings.
-	 * @param primarySource the primary source to load
-	 * @param args the application arguments (usually passed from a Java main method)
+	 * 启动{@link SpringApplication}的主入口方法之一
+	 * @param primarySource	加载的主启动类
+	 * @param args			应用启动参数（一般是从Java的main方法启动参数中带过来的参数）
 	 * @return the running {@link ApplicationContext}
 	 */
 	public static ConfigurableApplicationContext run(Class<?> primarySource, String... args) {
+		// 这里又调用另一个主入口方法，这里证明了其实Spring可以run多个主类的
 		return run(new Class<?>[] { primarySource }, args);
 	}
 
 	/**
-	 * Static helper that can be used to run a {@link SpringApplication} from the
-	 * specified sources using default settings and user supplied arguments.
-	 * @param primarySources the primary sources to load
-	 * @param args the application arguments (usually passed from a Java main method)
+	 * 启动{@link SpringApplication}的主入口方法之一
+	 * @param primarySources	加载的主启动类集合
+	 * @param args 				应用启动参数（一般是从Java的main方法启动参数中带过来的参数）
 	 * @return the running {@link ApplicationContext}
 	 */
 	public static ConfigurableApplicationContext run(Class<?>[] primarySources, String[] args) {
+		// 这里做两个工作：1.初始化Spring应用程序对象；2.通过启动参数启动
 		return new SpringApplication(primarySources).run(args);
 	}
 

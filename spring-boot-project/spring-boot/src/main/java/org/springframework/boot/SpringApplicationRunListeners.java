@@ -66,6 +66,10 @@ class SpringApplicationRunListeners {
 		}
 	}
 
+	/**
+	 * 可以看出所有{@link SpringApplicationRunListener}的子类都是这里被上下文用上了
+	 * @param context
+	 */
 	void started(ConfigurableApplicationContext context) {
 		for (SpringApplicationRunListener listener : this.listeners) {
 			listener.started(context);

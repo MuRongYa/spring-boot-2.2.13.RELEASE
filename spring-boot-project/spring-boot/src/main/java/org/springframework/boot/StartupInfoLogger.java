@@ -57,11 +57,9 @@ class StartupInfoLogger {
 	}
 
 	/**
-	 * 开始打印日志
-	 * @author Wu.Liang
-	 * @date 2022年3月7日
-	 * @param applicationLog
-	 * @param stopWatch
+	 * 开始打印日志.
+	 * @param applicationLog	日志类
+	 * @param stopWatch			计时器对象
 	 */
 	void logStarted(Log applicationLog, StopWatch stopWatch) {
 		if (applicationLog.isInfoEnabled()) {
@@ -70,10 +68,8 @@ class StartupInfoLogger {
 	}
 
 	/**
-	 * 打印开始信息
-	 * @author Wu.Liang
-	 * @date 2022年3月7日
-	 * @return
+	 * 打印开始信息.
+	 * @return	{@link CharSequence}
 	 */
 	private CharSequence getStartingMessage() {
 		StringBuilder message = new StringBuilder();
@@ -87,10 +83,8 @@ class StartupInfoLogger {
 	}
 
 	/**
-	 * 打印运行信息
-	 * @author Wu.Liang
-	 * @date 2022年3月7日
-	 * @return
+	 * 打印运行信息.
+	 * @return	{@link CharSequence}
 	 */
 	private CharSequence getRunningMessage() {
 		StringBuilder message = new StringBuilder();
@@ -102,11 +96,9 @@ class StartupInfoLogger {
 	}
 
 	/**
-	 * 打印SpringBoot启动时{@link StopWatch}记录的时间信息
-	 * @author Wu.Liang
-	 * @date 2022年3月7日
-	 * @param stopWatch
-	 * @return
+	 * 打印SpringBoot启动时{@link StopWatch}记录的时间信息.
+	 * @param stopWatch	计时器
+	 * @return	{@link CharSequence}
 	 */
 	private CharSequence getStartedMessage(StopWatch stopWatch) {
 		StringBuilder message = new StringBuilder();
@@ -159,11 +151,9 @@ class StartupInfoLogger {
 	}
 
 	/**
-	 * 打印上下文信息。
-     * 从System.getProperty("user.name")和System.getProperty("user.dir")中取了信息
-	 * @author Wu.Liang
-	 * @date 2022年3月7日
-	 * @param message
+	 * 打印上下文信息.
+     * 从System.getProperty("user.name")和System.getProperty("user.dir")中取了信息.
+	 * @param message	打印信息
 	 */
 	private void appendContext(StringBuilder message) {
 		StringBuilder context = new StringBuilder();

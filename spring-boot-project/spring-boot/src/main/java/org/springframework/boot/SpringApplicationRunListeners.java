@@ -21,7 +21,9 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
+
 import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.util.ReflectionUtils;
@@ -43,9 +45,7 @@ class SpringApplicationRunListeners {
 	}
 
 	/**
-	 * 启动内聚的{@link SpringApplicationRunListener}集合
-	 * @author Wu.Liang
-	 * @date 2022年3月7日
+	 * 启动内聚的{@link SpringApplicationRunListener}集合.
 	 */
 	void starting() {
 		for (SpringApplicationRunListener listener : this.listeners) {
@@ -72,8 +72,8 @@ class SpringApplicationRunListeners {
 	}
 
 	/**
-	 * 可以看出所有{@link SpringApplicationRunListener}的子类都是这里被上下文started；其实就是都被注册了{@link ApplicationStartedEvent}事件
-	 * @param context
+	 * 可以看出所有{@link SpringApplicationRunListener}的子类都是这里被上下文started；其实就是都被注册了{@link ApplicationStartedEvent}事件.
+	 * @param context	{@link ConfigurableApplicationContext}
 	 */
 	void started(ConfigurableApplicationContext context) {
 		for (SpringApplicationRunListener listener : this.listeners) {
@@ -82,10 +82,8 @@ class SpringApplicationRunListeners {
 	}
 
 	/**
-	 * 可以看出所有{@link SpringApplicationRunListener}的子类都是这里被上下文running；其实就是都被注册了{@link ApplicationReadyEvent}事件
-	 * @author Wu.Liang
-	 * @date 2022年3月7日
-	 * @param context
+	 * 可以看出所有{@link SpringApplicationRunListener}的子类都是这里被上下文running；其实就是都被注册了{@link ApplicationReadyEvent}事件.
+	 * @param context	{@link ConfigurableApplicationContext}
 	 */
 	void running(ConfigurableApplicationContext context) {
 		for (SpringApplicationRunListener listener : this.listeners) {

@@ -12,9 +12,9 @@ public class WuLiangStarter {
 
 	public static void main(String[] args) {
 		/** >>>>>>>>>>>>>>>> 从这里跟进去 <<<<<<<<<<<<<<<< */
-		/**                 ↓↓↓                         */
-		/**                 ↓↓                          */
-		/**                 ↓                           */
+		/**                 ↓↓↓                                                            */
+		/**                 ↓↓                                                                */
+		/**                 ↓                                                                    */
 		SpringApplication.run(WuLiangStarter.class, args);
 	}
 

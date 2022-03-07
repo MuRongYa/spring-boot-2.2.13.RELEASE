@@ -56,12 +56,25 @@ class StartupInfoLogger {
 		applicationLog.debug(LogMessage.of(this::getRunningMessage));
 	}
 
+	/**
+	 * 开始打印日志
+	 * @author Wu.Liang
+	 * @date 2022年3月7日
+	 * @param applicationLog
+	 * @param stopWatch
+	 */
 	void logStarted(Log applicationLog, StopWatch stopWatch) {
 		if (applicationLog.isInfoEnabled()) {
 			applicationLog.info(getStartedMessage(stopWatch));
 		}
 	}
 
+	/**
+	 * 打印开始信息
+	 * @author Wu.Liang
+	 * @date 2022年3月7日
+	 * @return
+	 */
 	private CharSequence getStartingMessage() {
 		StringBuilder message = new StringBuilder();
 		message.append("Starting ");
@@ -73,6 +86,12 @@ class StartupInfoLogger {
 		return message;
 	}
 
+	/**
+	 * 打印运行信息
+	 * @author Wu.Liang
+	 * @date 2022年3月7日
+	 * @return
+	 */
 	private CharSequence getRunningMessage() {
 		StringBuilder message = new StringBuilder();
 		message.append("Running with Spring Boot");
@@ -82,6 +101,13 @@ class StartupInfoLogger {
 		return message;
 	}
 
+	/**
+	 * 打印SpringBoot启动时{@link StopWatch}记录的时间信息
+	 * @author Wu.Liang
+	 * @date 2022年3月7日
+	 * @param stopWatch
+	 * @return
+	 */
 	private CharSequence getStartedMessage(StopWatch stopWatch) {
 		StringBuilder message = new StringBuilder();
 		message.append("Started ");
@@ -132,6 +158,13 @@ class StartupInfoLogger {
 		append(message, "with PID ", ApplicationPid::new);
 	}
 
+	/**
+	 * 打印上下文信息。
+     * 从System.getProperty("user.name")和System.getProperty("user.dir")中取了信息
+	 * @author Wu.Liang
+	 * @date 2022年3月7日
+	 * @param message
+	 */
 	private void appendContext(StringBuilder message) {
 		StringBuilder context = new StringBuilder();
 		ApplicationHome home = new ApplicationHome(this.sourceClass);

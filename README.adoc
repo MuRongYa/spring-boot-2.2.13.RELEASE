@@ -79,7 +79,7 @@ You also need JDK 1.8.
 ----
 	$ ./mvnw clean install
 	
-	or
+	或者（我建议使用下面两行命令来编译）
 	
 	mvn -N io.takari:maven:wrapper
 	./mvnw clean install -DskipTests -Pfast

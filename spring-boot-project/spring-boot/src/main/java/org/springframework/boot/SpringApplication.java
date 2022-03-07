@@ -304,7 +304,7 @@ public class SpringApplication {
 	}
 
 	/**
-	 * ★★★★ 启动一个Spring应用的核心主干方法【重要】 ★★★★
+	 * ★★★★★ 启动一个Spring应用的核心主干方法【重要】 ★★★★★
 	 * 这里会启动一个ConfigurableApplicationContext，它是{@link ApplicationContext}的子类
 	 * @param args	应用程序启动参数（通常是main方法参数带过来的）
 	 * @return		a running {@link ApplicationContext}
@@ -314,51 +314,87 @@ public class SpringApplication {
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();
 		
+		// 定义上下文对象
 		ConfigurableApplicationContext context = null;
+		// 定义自定义异常报告集合
 		Collection<SpringBootExceptionReporter> exceptionReporters = new ArrayList<>();
+		
+		// 2. 这里只是设置一下系统属性：java.awt.headless
 		configureHeadlessProperty();
+		
+		// 3. 启动{@link SpringApplicationRunListener}集合
 		SpringApplicationRunListeners listeners = getRunListeners(args);
 		listeners.starting();
+
 		try {
+			// 封装参数对象
 			ApplicationArguments applicationArguments = new DefaultApplicationArguments(args);
+			
+			// 4. 准备环境
 			ConfigurableEnvironment environment = prepareEnvironment(listeners, applicationArguments);
+			
+			// 5. 配置是否忽略Bean信息：spring.beaninfo.ignore
 			configureIgnoreBeanInfo(environment);
+			
+			// 6. 打印Banner
 			Banner printedBanner = printBanner(environment);
+			
+			// 7. 创建上下文环境
 			context = createApplicationContext();
+			
+			// 8. 构造异常报告的实例集合
 			exceptionReporters = getSpringFactoriesInstances(SpringBootExceptionReporter.class,
 					new Class[] { ConfigurableApplicationContext.class }, context);
+			
+			/* >>>>>>>>>>>>>>>> 9. 准备应用上下文环境【★★核心方法★★】<<<<<<<<<<<<<<<< */
 			prepareContext(context, environment, listeners, applicationArguments, printedBanner);
+			
+			/* >>>>>>>>>>>>>>>> 10. 刷新上下文环境【★★★★★核心方法★★★★★】<<<<<<<<<<<<<<<< */
 			refreshContext(context);
+			
+			// 11. 刷新上下文环境之后做的一些工作（这里是典型的模板设计模式，SpringBoot自身没有实现，提供给开发者灵活扩展）
 			afterRefresh(context, applicationArguments);
 			
-			// 这里计时器停止，打印一下启动时间和一些应用信息
+			// 这里计时器停止
 			stopWatch.stop();
 
+			// 打印一下启动时间和一些上下文应用信息
 			if (this.logStartupInfo) {
 				new StartupInfoLogger(this.mainApplicationClass).logStarted(getApplicationLog(), stopWatch);
 			}
 			
-			// SpringApplicationRunListener类型的监听器是在这里启动的
+			// 所有监听器都注册上{@link ApplicationStartedEvent}事件
 			listeners.started(context);
 			
 			// ApplicationRunner和CommandLineRunner类型的运行器是在这里调用的
 			callRunners(context, applicationArguments);
 		}
 		catch (Throwable ex) {
+			// 处理运行时的异常
 			handleRunFailure(context, ex, exceptionReporters, listeners);
 			throw new IllegalStateException(ex);
 		}
 
 		try {
+			// 所有监听器都注册上{@link ApplicationReadyEvent}事件
 			listeners.running(context);
 		}
 		catch (Throwable ex) {
+			// 处理运行时的异常
 			handleRunFailure(context, ex, exceptionReporters, null);
 			throw new IllegalStateException(ex);
 		}
 		return context;
 	}
 
+	/**
+	 * 准备环境
+	 * @author Wu.Liang
+	 * @date 2022年3月7日
+	 * @param listeners
+	 * @param applicationArguments
+	 * @return
+	 */
 	private ConfigurableEnvironment prepareEnvironment(SpringApplicationRunListeners listeners,
 			ApplicationArguments applicationArguments) {
 		// Create and configure the environment
@@ -386,8 +422,19 @@ public class SpringApplication {
 		}
 	}
 
+	/**
+	 * ★★ 上下文准备工作 ★★
+	 * @author Wu.Liang
+	 * @date 2022年3月7日
+	 * @param context				上下文
+	 * @param environment			环境
+	 * @param listeners				监听器
+	 * @param applicationArguments	由main方法的args参数封装的标准参数
+	 * @param printedBanner			Spring的图案条
+	 */
 	private void prepareContext(ConfigurableApplicationContext context, ConfigurableEnvironment environment,
 			SpringApplicationRunListeners listeners, ApplicationArguments applicationArguments, Banner printedBanner) {
+		// Environment环境设置入上下文，是在这里
 		context.setEnvironment(environment);
 		postProcessApplicationContext(context);
 		applyInitializers(context);
@@ -416,7 +463,14 @@ public class SpringApplication {
 		listeners.contextLoaded(context);
 	}
 
+	/**
+	 * ◆◆◆◆◆ 这个是刷新上下文的真正核心方法 ◆◆◆◆◆
+	 * @author Wu.Liang
+	 * @date 2022年3月7日
+	 * @param context
+	 */
 	private void refreshContext(ConfigurableApplicationContext context) {
+		// 注册一个上下文关闭时的钩子
 		if (this.registerShutdownHook) {
 			try {
 				context.registerShutdownHook();
@@ -425,9 +479,15 @@ public class SpringApplication {
 				// Not allowed in some environments.
 			}
 		}
+		/* ◆◆◆◆◆ 核心方法入口 ◆◆◆◆◆ */
 		refresh(context);
 	}
 
+	/**
+	 * 系统属性设置：java.awt.headless
+	 * @author Wu.Liang
+	 * @date 2022年3月7日
+	 */
 	private void configureHeadlessProperty() {
 		System.setProperty(SYSTEM_PROPERTY_JAVA_AWT_HEADLESS,
 				System.getProperty(SYSTEM_PROPERTY_JAVA_AWT_HEADLESS, Boolean.toString(this.headless)));
@@ -443,6 +503,16 @@ public class SpringApplication {
 		return getSpringFactoriesInstances(type, new Class<?>[] {});
 	}
 
+	/**
+	 * 获取工厂实例集合
+	 * @author Wu.Liang
+	 * @date 2022年3月7日
+	 * @param <T>
+	 * @param type
+	 * @param parameterTypes
+	 * @param args
+	 * @return
+	 */
 	private <T> Collection<T> getSpringFactoriesInstances(Class<T> type, Class<?>[] parameterTypes, Object... args) {
 		ClassLoader classLoader = getClassLoader();
 		// Use names and ensure unique to protect against duplicates
@@ -548,6 +618,12 @@ public class SpringApplication {
 		environment.setActiveProfiles(StringUtils.toStringArray(profiles));
 	}
 
+	/**
+	 * 配置是否忽略Bean信息：spring.beaninfo.ignore
+	 * @author Wu.Liang
+	 * @date 2022年3月7日
+	 * @param environment
+	 */
 	private void configureIgnoreBeanInfo(ConfigurableEnvironment environment) {
 		if (System.getProperty(CachedIntrospectionResults.IGNORE_BEANINFO_PROPERTY_NAME) == null) {
 			Boolean ignore = environment.getProperty("spring.beaninfo.ignore", Boolean.class, Boolean.TRUE);
@@ -582,9 +658,9 @@ public class SpringApplication {
 	}
 
 	/**
-	 * Strategy method used to create the {@link ApplicationContext}. By default this
-	 * method will respect any explicitly set application context or application context
-	 * class before falling back to a suitable default.
+	 * 策略方式创建{@link ApplicationContext}。
+	 * 如果设置了applicationContextClass，那么就使用；
+	 * 如果没有设置applicationContextClass，就根据webApplicationType判断，使用默认的SERVLET上下文还是REACTIVE或者是DEFAULT上下文
 	 * @return the application context (not yet refreshed)
 	 * @see #setApplicationContextClass(Class)
 	 */
@@ -682,6 +758,8 @@ public class SpringApplication {
 	}
 
 	/**
+	 * mainApplicationClass主类信息为空则使用默认的{@link SpringApplication}构造日志打印实例；
+	 * 否则使用mainApplicationClass直接构造日志打印实例。
 	 * Returns the {@link Log} for the application. By default will be deduced.
 	 * @return the application log
 	 */
@@ -771,7 +849,7 @@ public class SpringApplication {
 	}
 
 	/**
-	 * Called after the context has been refreshed.
+	 * SpringBoot预留的，在refresh上下文之后执行的模板方法
 	 * @param context the application context
 	 * @param args the application arguments
 	 */

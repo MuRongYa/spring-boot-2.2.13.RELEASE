@@ -32,6 +32,7 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.CachedIntrospectionResults;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -496,13 +497,13 @@ public class SpringApplication {
 	 * 这个方法是把type类的所有子实现类都实例化出来.
 	 * @author Wu.Liang
 	 * @date 2022年3月10日
-	 * @param <T>				泛型的父类
+	 * @param <T>				父类的泛型
 	 * @param type				这个是需要实例化的父类
 	 * @param parameterTypes	参数类型
 	 * @param classLoader		类加载器
 	 * @param args				启动参数
 	 * @param names				需要实例化的所有类名的集合
-	 * @return
+	 * @return	实例集合
 	 */
 	@SuppressWarnings("unchecked")
 	private <T> List<T> createSpringFactoriesInstances(Class<T> type, Class<?>[] parameterTypes,
@@ -762,7 +763,7 @@ public class SpringApplication {
 	 * @param sources the sources to load				主启动类
 	 */
 	protected void load(ApplicationContext context, Object[] sources) {
-		if (logger.isDebugEnabled()) {// debug级别下会打印这里的信息.
+		if (logger.isDebugEnabled()) { // debug级别下会打印这里的信息.
 			logger.debug("Loading source " + StringUtils.arrayToCommaDelimitedString(sources));
 		}
 		BeanDefinitionLoader loader = createBeanDefinitionLoader(getBeanDefinitionRegistry(context), sources);

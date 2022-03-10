@@ -149,7 +149,7 @@ class BeanDefinitionLoader {
 
 	/**
 	 * 加载主启动类.
-	 * @param source
+	 * @param source	主启动类
 	 * @return	加载的主启动类的个数
 	 */
 	private int load(Class<?> source) {

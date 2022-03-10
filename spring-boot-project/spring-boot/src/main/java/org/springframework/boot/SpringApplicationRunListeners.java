@@ -73,7 +73,7 @@ class SpringApplicationRunListeners {
 
 	/**
 	 * 可以看出所有{@link SpringApplicationRunListener}的子类都是这里被上下文started；其实就是都被注册了{@link ApplicationStartedEvent}事件.
-	 * @param context	{@link ConfigurableApplicationContext}
+	 * @param context {@link ConfigurableApplicationContext}
 	 */
 	void started(ConfigurableApplicationContext context) {
 		for (SpringApplicationRunListener listener : this.listeners) {
@@ -83,7 +83,7 @@ class SpringApplicationRunListeners {
 
 	/**
 	 * 可以看出所有{@link SpringApplicationRunListener}的子类都是这里被上下文running；其实就是都被注册了{@link ApplicationReadyEvent}事件.
-	 * @param context	{@link ConfigurableApplicationContext}
+	 * @param context {@link ConfigurableApplicationContext}
 	 */
 	void running(ConfigurableApplicationContext context) {
 		for (SpringApplicationRunListener listener : this.listeners) {

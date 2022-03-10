@@ -23,6 +23,7 @@ import org.springframework.core.io.support.SpringFactoriesLoader;
 /**
  * 用于支持自定义报告{@link SpringApplication}启动错误的回调接口.
  * 通过{@link SpringFactoriesLoader}加载，并且必须使用一个{@link ConfigurableApplicationContext}参数声明一个公共构造函数.
+ *
  * @author Phillip Webb
  * @since 2.0.0
  * @see ApplicationContextAware

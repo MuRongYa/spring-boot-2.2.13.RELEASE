@@ -240,10 +240,10 @@ public class SpringApplication {
 	private boolean lazyInitialization = false;
 
 	/**
-	 * 创建一个{@link SpringApplication}实例. 应用程序上下文会从指定的主类（primarySources）开始加载需要管理的Beans (see {@link SpringApplication class-level}
-	 * documentation for details. 这个实例可以在调用之前做很多自定义的操作.
-	 * {@link #run(String...)}.
-	 * @param primarySources	主类
+	 * 创建一个{@link SpringApplication}实例. 应用程序上下文会从指定的主类（primarySources）开始加载需要管理的Beans (see
+	 * {@link SpringApplication class-level} documentation for details.
+	 * 这个实例可以在调用之前做很多自定义的操作. {@link #run(String...)}.
+	 * @param primarySources 主类
 	 * @see #run(Class, String[])
 	 * @see #SpringApplication(ResourceLoader, Class...)
 	 * @see #setSources(Set)
@@ -253,11 +253,11 @@ public class SpringApplication {
 	}
 
 	/**
-	 * 创建一个{@link SpringApplication}实例. 应用程序上下文会从指定的主类（primarySources）开始加载需要管理的Beans (see {@link SpringApplication class-level}
-	 * documentation for details. 这个实例可以在调用之前做很多自定义的操作
-	 * {@link #run(String...)}.
-	 * @param resourceLoader	资源加载器
-	 * @param primarySources	主类
+	 * 创建一个{@link SpringApplication}实例. 应用程序上下文会从指定的主类（primarySources）开始加载需要管理的Beans (see
+	 * {@link SpringApplication class-level} documentation for details.
+	 * 这个实例可以在调用之前做很多自定义的操作 {@link #run(String...)}.
+	 * @param resourceLoader 资源加载器
+	 * @param primarySources 主类
 	 * @see #run(Class, String[])
 	 * @see #setSources(Set)
 	 */
@@ -279,7 +279,7 @@ public class SpringApplication {
 
 	/**
 	 * 判断一下主类的Class类型.
-	 * @return	主类的Class类型
+	 * @return 主类的Class类型
 	 */
 	private Class<?> deduceMainApplicationClass() {
 		try {
@@ -298,10 +298,10 @@ public class SpringApplication {
 	}
 
 	/**
-	 * ★★★★★ 启动一个Spring应用的核心主干方法【重要】. ★★★★★
-	 * 这里会启动一个ConfigurableApplicationContext. 它是{@link ApplicationContext}的子类.
-	 * @param args	应用程序启动参数（通常是main方法参数带过来的）
-	 * @return		a running {@link ApplicationContext}
+	 * ★★★★★ 启动一个Spring应用的核心主干方法【重要】. ★★★★★ 这里会启动一个ConfigurableApplicationContext.
+	 * 它是{@link ApplicationContext}的子类.
+	 * @param args 应用程序启动参数（通常是main方法参数带过来的）
+	 * @return a running {@link ApplicationContext}
 	 */
 	public ConfigurableApplicationContext run(String... args) {
 		// 1. 这里启动一个计时器
@@ -328,7 +328,8 @@ public class SpringApplication {
 			// 7. 创建上下文环境
 			context = createApplicationContext();
 			// 8. 构造异常报告的实例集合
-			exceptionReporters = getSpringFactoriesInstances(SpringBootExceptionReporter.class, new Class[] { ConfigurableApplicationContext.class }, context);
+			exceptionReporters = getSpringFactoriesInstances(SpringBootExceptionReporter.class,
+					new Class[] { ConfigurableApplicationContext.class }, context);
 			// >>>>>>>>>>>>>>>> 9. 准备应用上下文环境【★★核心方法★★】<<<<<<<<<<<<<<<<
 			prepareContext(context, environment, listeners, applicationArguments, printedBanner);
 			// >>>>>>>>>>>>>>>> 10. 刷新上下文环境【★★★★★核心方法★★★★★】<<<<<<<<<<<<<<<<
@@ -366,9 +367,9 @@ public class SpringApplication {
 
 	/**
 	 * 准备环境.
-	 * @param listeners				{@link SpringApplicationRunListener}集合
-	 * @param applicationArguments	封装的启动参数
-	 * @return						{@link ConfigurableEnvironment}
+	 * @param listeners {@link SpringApplicationRunListener}集合
+	 * @param applicationArguments 封装的启动参数
+	 * @return {@link ConfigurableEnvironment}
 	 */
 	private ConfigurableEnvironment prepareEnvironment(SpringApplicationRunListeners listeners,
 			ApplicationArguments applicationArguments) {
@@ -401,11 +402,11 @@ public class SpringApplication {
 	 * ★★ 上下文准备工作. ★★
 	 * @author Wu.Liang
 	 * @date 2022年3月7日
-	 * @param context				上下文
-	 * @param environment			环境
-	 * @param listeners				监听器
-	 * @param applicationArguments	由main方法的args参数封装的标准参数
-	 * @param printedBanner			图案条
+	 * @param context 上下文
+	 * @param environment 环境
+	 * @param listeners 监听器
+	 * @param applicationArguments 由main方法的args参数封装的标准参数
+	 * @param printedBanner 图案条
 	 */
 	private void prepareContext(ConfigurableApplicationContext context, ConfigurableEnvironment environment,
 			SpringApplicationRunListeners listeners, ApplicationArguments applicationArguments, Banner printedBanner) {
@@ -431,7 +432,8 @@ public class SpringApplication {
 		}
 		if (beanFactory instanceof DefaultListableBeanFactory) {
 			// 7. 设置工厂中的Bean可重写.
-			((DefaultListableBeanFactory) beanFactory).setAllowBeanDefinitionOverriding(this.allowBeanDefinitionOverriding);
+			((DefaultListableBeanFactory) beanFactory)
+					.setAllowBeanDefinitionOverriding(this.allowBeanDefinitionOverriding);
 		}
 		if (this.lazyInitialization) {
 			// 8. 上下文中加入Bean工厂的（懒加载的）后置处理器.后面要用到.
@@ -448,7 +450,7 @@ public class SpringApplication {
 
 	/**
 	 * 这个是刷新上下文的真正核心方法入口.
-	 * @param context	上下文
+	 * @param context 上下文
 	 */
 	private void refreshContext(ConfigurableApplicationContext context) {
 		// 注册一个上下文关闭时的钩子
@@ -497,13 +499,13 @@ public class SpringApplication {
 	 * 这个方法是把type类的所有子实现类都实例化出来.
 	 * @author Wu.Liang
 	 * @date 2022年3月10日
-	 * @param <T>				父类的泛型
-	 * @param type				这个是需要实例化的父类
-	 * @param parameterTypes	参数类型
-	 * @param classLoader		类加载器
-	 * @param args				启动参数
-	 * @param names				需要实例化的所有类名的集合
-	 * @return	实例集合
+	 * @param <T> 父类的泛型
+	 * @param type 这个是需要实例化的父类
+	 * @param parameterTypes 参数类型
+	 * @param classLoader 类加载器
+	 * @param args 启动参数
+	 * @param names 需要实例化的所有类名的集合
+	 * @return 实例集合
 	 */
 	@SuppressWarnings("unchecked")
 	private <T> List<T> createSpringFactoriesInstances(Class<T> type, Class<?>[] parameterTypes,
@@ -604,7 +606,7 @@ public class SpringApplication {
 
 	/**
 	 * 配置是否忽略Bean信息：spring.beaninfo.ignore.
-	 * @param environment	环境
+	 * @param environment 环境
 	 */
 	private void configureIgnoreBeanInfo(ConfigurableEnvironment environment) {
 		if (System.getProperty(CachedIntrospectionResults.IGNORE_BEANINFO_PROPERTY_NAME) == null) {
@@ -640,8 +642,7 @@ public class SpringApplication {
 	}
 
 	/**
-	 * 策略方式创建{@link ApplicationContext}.
-	 * 如果设置了applicationContextClass，那么就使用.
+	 * 策略方式创建{@link ApplicationContext}. 如果设置了applicationContextClass，那么就使用.
 	 * 如果没有设置applicationContextClass，就根据webApplicationType判断，使用默认的SERVLET上下文还是REACTIVE或者是DEFAULT上下文.
 	 * @return the application context (not yet refreshed)
 	 * @see #setApplicationContextClass(Class)
@@ -675,7 +676,8 @@ public class SpringApplication {
 	 * @param context the application context
 	 */
 	protected void postProcessApplicationContext(ConfigurableApplicationContext context) {
-		// 1. 注册一个单例的org.springframework.context.annotation.internalConfigurationBeanNameGenerator.
+		// 1.
+		// 注册一个单例的org.springframework.context.annotation.internalConfigurationBeanNameGenerator.
 		if (this.beanNameGenerator != null) {
 			context.getBeanFactory().registerSingleton(AnnotationConfigUtils.CONFIGURATION_BEAN_NAME_GENERATOR,
 					this.beanNameGenerator);
@@ -746,8 +748,8 @@ public class SpringApplication {
 
 	/**
 	 * mainApplicationClass主类信息为空则使用默认的{@link SpringApplication}构造日志打印实例；
-	 * 否则使用mainApplicationClass直接构造日志打印实例。
-	 * Returns the {@link Log} for the application. By default will be deduced.
+	 * 否则使用mainApplicationClass直接构造日志打印实例。 Returns the {@link Log} for the application. By
+	 * default will be deduced.
 	 * @return the application log
 	 */
 	protected Log getApplicationLog() {
@@ -759,8 +761,8 @@ public class SpringApplication {
 
 	/**
 	 * 加载所有的Bean到上下文中.
-	 * @param context the context to load beans into	上下文
-	 * @param sources the sources to load				主启动类
+	 * @param context the context to load beans into 上下文
+	 * @param sources the sources to load 主启动类
 	 */
 	protected void load(ApplicationContext context, Object[] sources) {
 		if (logger.isDebugEnabled()) { // debug级别下会打印这里的信息.
@@ -846,8 +848,8 @@ public class SpringApplication {
 
 	/**
 	 * {@link ApplicationRunner}和{@link CommandLineRunner}在这里被上下文使用.
-	 * @param context	上下文
-	 * @param args		启动参数
+	 * @param context 上下文
+	 * @param args 启动参数
 	 */
 	private void callRunners(ApplicationContext context, ApplicationArguments args) {
 		List<Object> runners = new ArrayList<>();
@@ -867,8 +869,8 @@ public class SpringApplication {
 
 	/**
 	 * 跑{@link ApplicationRunner}.
-	 * @param runner	{@link ApplicationRunner}
-	 * @param args		启动参数
+	 * @param runner {@link ApplicationRunner}
+	 * @param args 启动参数
 	 */
 	private void callRunner(ApplicationRunner runner, ApplicationArguments args) {
 		try {
@@ -881,8 +883,8 @@ public class SpringApplication {
 
 	/**
 	 * 跑{@link CommandLineRunner}.
-	 * @param runner	{@link CommandLineRunner}
-	 * @param args		启动参数
+	 * @param runner {@link CommandLineRunner}
+	 * @param args 启动参数
 	 */
 	private void callRunner(CommandLineRunner runner, ApplicationArguments args) {
 		try {
@@ -1311,8 +1313,8 @@ public class SpringApplication {
 
 	/**
 	 * 启动{@link SpringApplication}的主入口方法之一.
-	 * @param primarySource	加载的主启动类
-	 * @param args			应用启动参数（一般是从Java的main方法启动参数中带过来的参数）
+	 * @param primarySource 加载的主启动类
+	 * @param args 应用启动参数（一般是从Java的main方法启动参数中带过来的参数）
 	 * @return the running {@link ApplicationContext}
 	 */
 	public static ConfigurableApplicationContext run(Class<?> primarySource, String... args) {
@@ -1322,8 +1324,8 @@ public class SpringApplication {
 
 	/**
 	 * 启动{@link SpringApplication}的主入口方法之一.
-	 * @param primarySources	加载的主启动类集合
-	 * @param args 				应用启动参数（一般是从Java的main方法启动参数中带过来的参数）
+	 * @param primarySources 加载的主启动类集合
+	 * @param args 应用启动参数（一般是从Java的main方法启动参数中带过来的参数）
 	 * @return the running {@link ApplicationContext}
 	 */
 	public static ConfigurableApplicationContext run(Class<?>[] primarySources, String[] args) {

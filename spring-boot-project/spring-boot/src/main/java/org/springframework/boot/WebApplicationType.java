@@ -60,7 +60,7 @@ public enum WebApplicationType {
 
 	/**
 	 * 判断当前Spring应用程序是什么类型的程序.比如是servlet应用.还是响应式应用.或者是普通java应用.
-	 * @return	{@link WebApplicationType}
+	 * @return {@link WebApplicationType}
 	 */
 	static WebApplicationType deduceFromClasspath() {
 		if (ClassUtils.isPresent(WEBFLUX_INDICATOR_CLASS, null) && !ClassUtils.isPresent(WEBMVC_INDICATOR_CLASS, null)

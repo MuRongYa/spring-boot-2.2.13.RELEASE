@@ -32,7 +32,6 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.CachedIntrospectionResults;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -409,11 +408,13 @@ public class SpringApplication {
 	 */
 	private void prepareContext(ConfigurableApplicationContext context, ConfigurableEnvironment environment,
 			SpringApplicationRunListeners listeners, ApplicationArguments applicationArguments, Banner printedBanner) {
-		// 1. Environment环境设置入上下文，是在这里
+		// 1. Environment环境设置入上下文，是在这里.
 		context.setEnvironment(environment);
-		// 2. ★★{@link ConfigurableApplicationContext}的后置处理（功能增强）★★
+		// 2. ★★{@link ConfigurableApplicationContext}的后置处理（功能增强）★★.
 		postProcessApplicationContext(context);
+		// 3. 所有{@link ApplicationContextInitializer}实现类的初始化工作在这里执行.
 		applyInitializers(context);
+		// 4. 这里其实是对监听器注册了{@link ApplicationContextInitializedEvent}事件.
 		listeners.contextPrepared(context);
 		if (this.logStartupInfo) {
 			logStartupInfo(context.getParent() == null);
@@ -421,21 +422,26 @@ public class SpringApplication {
 		}
 		// Add boot specific singleton beans
 		ConfigurableListableBeanFactory beanFactory = context.getBeanFactory();
+		// 5. 这儿把启动参数也加入到Bean工厂.
 		beanFactory.registerSingleton("springApplicationArguments", applicationArguments);
 		if (printedBanner != null) {
+			// 6. Banner也加入到Bean工厂中.
 			beanFactory.registerSingleton("springBootBanner", printedBanner);
 		}
 		if (beanFactory instanceof DefaultListableBeanFactory) {
-			((DefaultListableBeanFactory) beanFactory)
-					.setAllowBeanDefinitionOverriding(this.allowBeanDefinitionOverriding);
+			// 7. 设置工厂中的Bean可重写.
+			((DefaultListableBeanFactory) beanFactory).setAllowBeanDefinitionOverriding(this.allowBeanDefinitionOverriding);
 		}
 		if (this.lazyInitialization) {
+			// 8. 上下文中加入Bean工厂的（懒加载的）后置处理器.后面要用到.
 			context.addBeanFactoryPostProcessor(new LazyInitializationBeanFactoryPostProcessor());
 		}
 		// Load the sources
 		Set<Object> sources = getAllSources();
 		Assert.notEmpty(sources, "Sources must not be empty");
+		// 9. 主启动类加载到上下文中.
 		load(context, sources.toArray(new Object[0]));
+		// 10. 加载监听器并注册{@link ApplicationPreparedEvent}事件.
 		listeners.contextLoaded(context);
 	}
 
@@ -477,13 +483,27 @@ public class SpringApplication {
 
 	private <T> Collection<T> getSpringFactoriesInstances(Class<T> type, Class<?>[] parameterTypes, Object... args) {
 		ClassLoader classLoader = getClassLoader();
-		// Use names and ensure unique to protect against duplicates
+		// 获取classLoader中加载的所有匹配type的类名.
 		Set<String> names = new LinkedHashSet<>(SpringFactoriesLoader.loadFactoryNames(type, classLoader));
+		// 创建实例.
 		List<T> instances = createSpringFactoriesInstances(type, parameterTypes, classLoader, args, names);
+		// 根据注解进行排序.
 		AnnotationAwareOrderComparator.sort(instances);
 		return instances;
 	}
 
+	/**
+	 * 这个方法是把type类的所有子实现类都实例化出来.
+	 * @author Wu.Liang
+	 * @date 2022年3月10日
+	 * @param <T>				泛型的父类
+	 * @param type				这个是需要实例化的父类
+	 * @param parameterTypes	参数类型
+	 * @param classLoader		类加载器
+	 * @param args				启动参数
+	 * @param names				需要实例化的所有类名的集合
+	 * @return
+	 */
 	@SuppressWarnings("unchecked")
 	private <T> List<T> createSpringFactoriesInstances(Class<T> type, Class<?>[] parameterTypes,
 			ClassLoader classLoader, Object[] args, Set<String> names) {
@@ -491,6 +511,7 @@ public class SpringApplication {
 		for (String name : names) {
 			try {
 				Class<?> instanceClass = ClassUtils.forName(name, classLoader);
+				// 这里是确保instanceClass是type的子类.
 				Assert.isAssignable(type, instanceClass);
 				Constructor<?> constructor = instanceClass.getDeclaredConstructor(parameterTypes);
 				T instance = (T) BeanUtils.instantiateClass(constructor, args);
@@ -701,13 +722,15 @@ public class SpringApplication {
 	}
 
 	/**
-	 * Called to log active profile information.
+	 * 打印激活的配置信息.
 	 * @param context the application context
 	 */
 	protected void logStartupProfileInfo(ConfigurableApplicationContext context) {
 		Log log = getApplicationLog();
 		if (log.isInfoEnabled()) {
+			// 从环境中获取激活的配置.
 			String[] activeProfiles = context.getEnvironment().getActiveProfiles();
+			// 如果没有激活的配置.则使用默认的配置.
 			if (ObjectUtils.isEmpty(activeProfiles)) {
 				String[] defaultProfiles = context.getEnvironment().getDefaultProfiles();
 				log.info("No active profile set, falling back to default profiles: "
@@ -734,12 +757,12 @@ public class SpringApplication {
 	}
 
 	/**
-	 * Load beans into the application context.
-	 * @param context the context to load beans into
-	 * @param sources the sources to load
+	 * 加载所有的Bean到上下文中.
+	 * @param context the context to load beans into	上下文
+	 * @param sources the sources to load				主启动类
 	 */
 	protected void load(ApplicationContext context, Object[] sources) {
-		if (logger.isDebugEnabled()) {
+		if (logger.isDebugEnabled()) {// debug级别下会打印这里的信息.
 			logger.debug("Loading source " + StringUtils.arrayToCommaDelimitedString(sources));
 		}
 		BeanDefinitionLoader loader = createBeanDefinitionLoader(getBeanDefinitionRegistry(context), sources);
@@ -803,11 +826,12 @@ public class SpringApplication {
 	}
 
 	/**
-	 * Refresh the underlying {@link ApplicationContext}.
+	 * 刷新底层上下文{@link ApplicationContext}.★★★★核心方法入口★★★★.
 	 * @param applicationContext the application context to refresh
 	 */
 	protected void refresh(ApplicationContext applicationContext) {
 		Assert.isInstanceOf(AbstractApplicationContext.class, applicationContext);
+		// 上下文对象必须是{@link AbstractApplicationContext}的子类.
 		((AbstractApplicationContext) applicationContext).refresh();
 	}
 

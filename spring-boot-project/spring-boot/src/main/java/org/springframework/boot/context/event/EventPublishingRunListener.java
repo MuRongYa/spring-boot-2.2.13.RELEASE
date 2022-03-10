@@ -82,6 +82,11 @@ public class EventPublishingRunListener implements SpringApplicationRunListener,
 				.multicastEvent(new ApplicationContextInitializedEvent(this.application, this.args, context));
 	}
 
+	/**
+	 * 1.从上下文中取出所有监听器.如果是实现了{@link ApplicationContextAware}接口的监听器.则需要设置一下上下文.
+	 * 2.然后把监听器加入到上下文中.
+	 * 3.再注册{@link ApplicationPreparedEvent}事件.
+	 */
 	@Override
 	public void contextLoaded(ConfigurableApplicationContext context) {
 		for (ApplicationListener<?> listener : this.application.getListeners()) {

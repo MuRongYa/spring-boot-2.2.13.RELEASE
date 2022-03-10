@@ -147,12 +147,19 @@ class BeanDefinitionLoader {
 		throw new IllegalArgumentException("Invalid source type " + source.getClass());
 	}
 
+	/**
+	 * 加载主启动类.
+	 * @param source
+	 * @return	加载的主启动类的个数
+	 */
 	private int load(Class<?> source) {
 		if (isGroovyPresent() && GroovyBeanDefinitionSource.class.isAssignableFrom(source)) {
 			// Any GroovyLoaders added in beans{} DSL can contribute beans here
+			// 这里说明还支持Groovy定义的启动类.
 			GroovyBeanDefinitionSource loader = BeanUtils.instantiateClass(source, GroovyBeanDefinitionSource.class);
 			load(loader);
 		}
+		// 把主启动类加载到annotatedReader中
 		if (isComponent(source)) {
 			this.annotatedReader.register(source);
 			return 1;
